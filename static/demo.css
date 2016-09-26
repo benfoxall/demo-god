@@ -1,0 +1,49 @@
+/*
+blue:  #549eff
+dark:  #2b303b
+light: #f4f7f9
+
+*/
+
+body {
+  font-family: monospace;
+  color: #2b303b;
+  font-size: 125%;
+  margin: 3em;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 100;
+}
+
+a {
+  color: #549eff
+}
+
+p {
+  max-width: 30em;
+}
+
+h1 a {
+  text-decoration: none
+}
+
+input {
+  font-family: inherit;
+  font-size: 1em;
+  border: none;
+  background: #549eff;
+  color: #fff;
+  cursor: pointer;
+  transition: .1s
+}
+input:hover {
+  background: #2b303b
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background: #ccc
+}

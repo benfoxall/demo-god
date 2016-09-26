@@ -6,9 +6,7 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1')
     link(rel='stylesheet', href='demo.css', media='screen')
   body
-    h1 Pusher Demo
-
-    if user
-      hr
-      p
-        | Hello, #{user.displayName} (#[a(href='/logout') logout])
+    h1= url
+    h2 There's no demo here yet
+    form(method='post')
+      input(type='submit', value="start demo")

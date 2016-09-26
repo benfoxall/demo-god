@@ -9,6 +9,9 @@ const RedisStore = require('connect-redis')(session)
 const app = express()
 const redis = new Redis(process.env.REDIS_URL)
 
+// serve static files before everything else
+app.use(express.static('static'))
+
 app.use(require('cookie-parser')())
 app.use(require('body-parser').urlencoded({ extended: true }))
 app.use(require('express-session')({
@@ -68,3 +71,10 @@ app.get('/', (req, res) => {
 })
 
 app.listen(process.env.PORT || 3000)
+
+app.get('/:key', (req, res) => {
+
+  const url = req.get('host') + '/' + req.params.key
+
+  res.render('demo', {url: url})
+})
