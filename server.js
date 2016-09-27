@@ -49,8 +49,13 @@ passport.use(new GoogleStrategy({
     hd: 'pusher.com'
   },
   function(accessToken, refreshToken, profile, cb) {
-    console.log('FOUND', profile)
-    cb(null, profile)
+    if(profile._json.domain != 'pusher.com') {
+      console.error("Non pusher.com login attempt: ", JSON.stringify(profile._json) )
+      cb("Must be a pusher.com address")
+    } else {
+      cb(null, profile)
+    }
+
   }
 ))
 
