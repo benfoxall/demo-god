@@ -29,7 +29,12 @@ h1 a {
   text-decoration: none
 }
 
-input {
+label {
+  display: block;
+  margin-bottom: 1em;
+}
+
+.btn {
   font-family: inherit;
   font-size: 1em;
   border: none;
@@ -38,7 +43,7 @@ input {
   cursor: pointer;
   transition: .1s
 }
-input:hover {
+.btn:hover {
   background: #2b303b
 }
 
@@ -46,4 +51,20 @@ hr {
   border: none;
   height: 1px;
   background: #ccc
+}
+
+.error {
+  background: #fcc;
+  padding: .5em;
+  border-left: 3px solid red
+}
+
+code {
+  display: block;
+  padding: .5em;
+  margin: .25em;
+  background: #2b303b;
+  color: #f4f7f9;
+  float: left;
+  clear:left
 }

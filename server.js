@@ -5,6 +5,9 @@ const passport = require('passport')
 const Redis = require('ioredis')
 const session = require('express-session')
 const RedisStore = require('connect-redis')(session)
+const crypto = require('crypto')
+
+const slugValidator = require('./lib/slug')
 
 const app = express()
 const redis = new Redis(process.env.REDIS_URL)
@@ -55,7 +58,7 @@ app.get('/login', passport.authenticate('google', { scope: ['profile', 'email'] 
 
 app.get('/callback',
   passport.authenticate('google'),
-  (req, res) => res.redirect('/')
+  (req, res) => res.redirect('/new')
 )
 
 app.get('/logout', function(req, res){
@@ -66,12 +69,62 @@ app.get('/logout', function(req, res){
 
 app.set('view engine', 'pug')
 
-app.get('/', (req, res) => {
-  res.render('index', {user: req.user})
+app.get('/',    (req, res) => res.render('index', {user: req.user}))
+app.get('/new', (req, res) => res.render('new', {user: req.user}))
+app.post('/new', (req, res) => {
+
+  const slug = req.body.slug
+
+  // slug is valid
+  Promise.resolve(slug)
+
+  .then(slugValidator)
+
+  // user is allowed
+  .then(_ => {
+    if(!req.user) throw "Not authorised"
+  })
+
+
+  // slug hasn't been taken
+  .then(_ =>
+    redis.exists(`demo:${slug}`)
+      .then(result => {
+        console.log(">>>", result, `demo:${slug}`)
+        if(result) throw "Already taken"
+        return slug
+      })
+  )
+
+  // create it
+  .then(_ => {
+      redis.set(`demo:${slug}`, JSON.stringify({
+        secret: crypto.randomBytes(32).toString('hex'),
+        user: req.user.id,
+        pusher: {
+          config: 'here'
+        }
+      }))
+    }
+  )
+
+  .then(_ => res.redirect(`/${slug}`))
+
+  .catch( error =>
+    res.render('new', {
+      user: req.user,
+      error: error,
+      slug: slug
+    })
+  )
+
 })
 
 app.listen(process.env.PORT || 3000)
 
+
+
+// potentially a demo
 app.get('/:key', (req, res) => {
 
   const url = req.get('host') + '/' + req.params.key

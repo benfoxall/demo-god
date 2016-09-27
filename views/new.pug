@@ -1,0 +1,24 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Demo
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', href='demo.css', media='screen')
+  body
+    h1 Start a demo
+
+    if error
+      p.error= error
+
+    if user
+      hr
+      p Howdy, #{user.displayName} (#[a(href='/logout') logout])
+      form(method='post')
+        label
+          | url slug: #[input(type='text', name='slug', value=slug)]
+
+        input.btn(type='submit', name='create')
+    else
+
+      a(href='login') Login
