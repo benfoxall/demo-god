@@ -95,7 +95,6 @@ app.post('/new', (req, res) => {
   .then(_ =>
     redis.exists(`demo:${slug}`)
       .then(result => {
-        console.log(">>>", result, `demo:${slug}`)
         if(result) throw "Already taken"
         return slug
       })
@@ -132,7 +131,44 @@ app.listen(process.env.PORT || 3000)
 // potentially a demo
 app.get('/:key', (req, res) => {
 
-  const url = req.get('host') + '/' + req.params.key
+  var key = req.params.key
 
-  res.render('demo', {url: url})
+  try {
+    slugValidator(key)
+  } catch (e) {
+    return res.sendStatus(404)
+  }
+
+  const url = req.get('host') + '/' + key
+
+  Promise.all([
+    redis.get(`demo:${key}`),
+    redis.get(`demo:${key}:content:index.html`)
+  ])
+  .then( result => {
+    const config_json = result[0]
+    const content = result[1]
+
+    if(!config_json)
+      return res.sendStatus(404)
+
+    if(content)
+      return res.send(content)
+
+    const config = JSON.parse(config_json)
+
+    if(req.user && (req.user.id == config.user)) {
+      return res.render('demo-setup', {
+        url: url,
+        config: config
+      })
+    } else {
+      res.render('demo-pending', {
+        url: url,
+        config: config
+      })
+    }
+
+  })
+  
 })
