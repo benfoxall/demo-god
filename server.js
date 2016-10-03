@@ -8,6 +8,7 @@ const RedisStore = require('connect-redis')(session)
 const crypto = require('crypto')
 
 const slugValidator = require('./lib/slug')
+const bundler = require('./lib/bundler')
 
 const app = express()
 const redis = new Redis(process.env.REDIS_URL)
@@ -129,17 +130,18 @@ app.listen(process.env.PORT || 3000)
 
 
 // potentially a demo
-app.get('/:key', (req, res) => {
+app.get('/:key', (req, res, next) => {
 
   var key = req.params.key
 
   try {
     slugValidator(key)
   } catch (e) {
-    return res.sendStatus(404)
+    return next()
   }
 
-  const url = req.get('host') + '/' + key
+  const path = '/' + key
+  const url = req.get('host') + path
 
   Promise.all([
     redis.get(`demo:${key}`),
@@ -150,7 +152,7 @@ app.get('/:key', (req, res) => {
     const content = result[1]
 
     if(!config_json)
-      return res.sendStatus(404)
+      return next()
 
     if(content)
       return res.send(content)
@@ -160,15 +162,53 @@ app.get('/:key', (req, res) => {
     if(req.user && (req.user.id == config.user)) {
       return res.render('demo-setup', {
         url: url,
+        path: path,
         config: config
       })
     } else {
       res.render('demo-pending', {
-        url: url,
-        config: config
+        url: url
       })
     }
 
   })
-  
+
+})
+
+
+// demo source
+app.get('/:key.tar.gz', (req, res, next) => {
+
+  var key = req.params.key
+
+  try {
+    slugValidator(key)
+  } catch (e) {
+    return next()
+  }
+
+  const path = '/' + key
+  const url = req.get('host') + path
+
+  redis.get(`demo:${key}`)
+  .then( config_json => {
+
+    if(!config_json)
+      return next()
+
+    const config = JSON.parse(config_json)
+
+    if(req.user && (req.user.id == config.user)) {
+
+      return bundler('./demos/broadcast', {
+        PUSHER_KEY: 'foo',
+        PUSHER_YEAH: 'bar'
+      }).pipe(res)
+
+    } else {
+      next()
+    }
+
+  })
+
 })
