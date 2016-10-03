@@ -201,8 +201,15 @@ app.get('/:key.tar.gz', (req, res, next) => {
     if(req.user && (req.user.id == config.user)) {
 
       return bundler('./demos/broadcast', {
-        PUSHER_KEY: 'foo',
-        PUSHER_YEAH: 'bar'
+
+        DEMO_KEY: key,
+
+        // TODO - these should be per-user
+        PUSHER_APP_ID: process.env.PUSHER_APP_ID,
+        PUSHER_KEY: process.env.PUSHER_KEY,
+        PUSHER_SECRET: process.env.PUSHER_SECRET,
+        PUSHER_CLUSTER: process.env.PUSHER_CLUSTER,
+
       }, res)
 
     } else {
