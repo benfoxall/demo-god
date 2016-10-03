@@ -203,7 +203,7 @@ app.get('/:key.tar.gz', (req, res, next) => {
       return bundler('./demos/broadcast', {
         PUSHER_KEY: 'foo',
         PUSHER_YEAH: 'bar'
-      }).pipe(res)
+      }, res)
 
     } else {
       next()
