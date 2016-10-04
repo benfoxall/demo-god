@@ -1,9 +1,13 @@
 
-pusher.trigger('~~DEMO_KEY~~_broadcast', 'display', {
-  text: 'Hello world'
-})
+// Put in some random data
+var interval = setInterval(function(){
+  pusher.trigger('~~DEMO_KEY~~_data_source', 'message', {
+    timestamp: +new Date,
+    value: Math.floor(Math.random() * 100)
+  })
+}, 500)
 
 
-pusher.trigger('~~DEMO_KEY~~_broadcast', 'alert', {
-  message: 'Hello'
-})
+
+// optionally, cancel event
+clearInterval(interval)

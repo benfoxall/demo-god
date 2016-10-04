@@ -203,7 +203,7 @@ app.get('/:key.tar.gz', (req, res, next) => {
 
     if(req.user && (req.user.id == config.user)) {
 
-      return bundler('./demos/broadcast', {
+      return bundler('./demos/dashboard', {
 
         DEMO_KEY: key,
 

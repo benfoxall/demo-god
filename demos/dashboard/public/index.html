@@ -2,11 +2,18 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Pusher Broadcast Demo</title>
-    <style media="screen">body {font-family: sans-serif}</style>
+    <title>Pusher Dashboard Demo</title>
+    <style media="screen">
+      body {font-family: sans-serif}
+      * {transition: .2s}
+      path{stroke:#000; fill: none}
+    </style>
   </head>
   <body>
-    <h1>Demo <span id="text">-</span></h1>
+    <h1>Dashboard</h1>
+    <h3>Value: <span id="value"></span></h3>
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://js.pusher.com/3.2/pusher.min.js"></script>
     <script>
 
@@ -14,17 +21,59 @@
         encrypted: true
       })
 
-      var channel = pusher.subscribe('~~DEMO_KEY~~_broadcast')
+      var channel = pusher.subscribe('~~DEMO_KEY~~_data_source')
 
-
-      // channel.bind('display', function(data) {
-      //   text.innerText = data.text
+      // Log the messages
+      // channel.bind('message', function(data) {
+      //   console.log(data)
       // })
 
 
-      // channel.bind('alert', function(data) {
-      //   alert(data.message)
+      // show the value
+      // channel.bind('message', function(data) {
+      //   document.querySelector('#value').innerText = data.value
       // })
+
+      // change the color
+      // channel.bind('message', function(data) {
+      //   document.querySelector('h1').style.backgroundColor
+      //     = 'hsla(' + data.value + ', 100%, 50%, 0.2)'
+      // })
+
+      // draw a graph
+      /*
+      var svg = d3.select('body')
+        .append('svg')
+        .attr('width', 500)
+        .attr('height', 100)
+
+      var path = svg.append('path')
+
+      var x = d3.scaleLinear()
+        .range([500, 0])
+
+      var y = d3.scaleLinear()
+        .range([0, 100])
+
+      var line = d3.line()
+        .x(function(d) { return x(d.timestamp) })
+        .y(function(d) { return y(d.value) })
+
+      var points = []
+
+      channel.bind('message', function(data) {
+        points.push(data)
+
+        x.domain(d3.extent(points.map(function(d){return d.timestamp})))
+        y.domain(d3.extent(points.map(function(d){return d.value})))
+
+        path
+          .datum(points)
+          .attr('d', line)
+
+      })
+
+      */
 
     </script>
   </body>
