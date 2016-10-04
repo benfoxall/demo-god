@@ -1,0 +1,9 @@
+
+pusher.trigger('~~DEMO_KEY~~_broadcast', 'display', {
+  text: 'Hello world'
+})
+
+
+pusher.trigger('~~DEMO_KEY~~_broadcast', 'alert', {
+  message: 'Hello'
+})

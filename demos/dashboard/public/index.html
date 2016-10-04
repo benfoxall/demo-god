@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Pusher Broadcast Demo</title>
+    <style media="screen">body {font-family: sans-serif}</style>
+  </head>
+  <body>
+    <h1>Demo <span id="text">-</span></h1>
+    <script src="https://js.pusher.com/3.2/pusher.min.js"></script>
+    <script>
+
+      var pusher = new Pusher('~~PUSHER_KEY~~', {
+        encrypted: true
+      })
+
+      var channel = pusher.subscribe('~~DEMO_KEY~~_broadcast')
+
+
+      // channel.bind('display', function(data) {
+      //   text.innerText = data.text
+      // })
+
+
+      // channel.bind('alert', function(data) {
+      //   alert(data.message)
+      // })
+
+    </script>
+  </body>
+</html>
