@@ -16,7 +16,15 @@ html
       p Howdy, #{user.displayName} (#[a(href='/logout') logout])
       form(method='post')
         label
-          | url slug: #[input(type='text', name='slug', value=slug)]
+          | url slug:#[input(type='text', name='slug', value=slug)]
+
+        label
+          | demo:
+          select
+            option Broadcast
+            option Client Events*
+            option Graphs*
+
 
         input.btn(type='submit', name='create')
     else
