@@ -10,6 +10,11 @@ const pusher = new Pusher({
   encrypted: true
 })
 
-pusher.trigger('~~DEMO_KEY~~_broadcast', 'display-text', {
-  text: 'Hello world ' + Math.random()
+
+const repl = require('repl')
+repl.start({
+  prompt: '>',
+  input: process.stdin,
+  output: process.stdout
 })
+.context.pusher = pusher
