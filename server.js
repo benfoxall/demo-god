@@ -6,6 +6,7 @@ const Redis = require('ioredis')
 const session = require('express-session')
 const RedisStore = require('connect-redis')(session)
 const crypto = require('crypto')
+const Pusher = require('pusher')
 
 const slugValidator = require('./lib/slug')
 const bundler = require('./lib/bundler')
@@ -155,7 +156,7 @@ app.get('/:key', (req, res, next) => {
       return next()
 
     if(content)
-      return res.send(content)
+      return res.send(injectLR(content,key))
 
     const config = JSON.parse(config_json)
 
@@ -163,11 +164,13 @@ app.get('/:key', (req, res, next) => {
       return res.render('demo-setup', {
         url: url,
         path: path,
-        config: config
+        config: config,
+        lr: lrSnippet(key)
       })
     } else {
       res.render('demo-pending', {
-        url: url
+        url: url,
+        lr: lrSnippet(key)
       })
     }
 
@@ -261,6 +264,8 @@ app.post('/:key/:secret/public/:file', (req, res, next) => {
           .then(d => {
             console.log("saved")
             res.send("OK")
+
+            triggerLR(key)
           })
           .catch(next)
         ).on('error', next)
@@ -276,3 +281,36 @@ app.post('/:key/:secret/public/:file', (req, res, next) => {
   .catch(next)
 
 })
+
+
+function injectLR(content, key){
+
+  return content.replace( '</body>', `${lrSnippet(key)}</body>`)
+
+}
+
+
+function lrSnippet(key) {
+  return `<!-- reload functionality -->
+  <script>if(typeof Pusher == 'undefined')document.write('<scr'+'ipt src="https://js.pusher.com/3.2/pusher.min.js"></scr'+'ipt>')</script>
+  <script type="text/javascript">
+  new Pusher('${process.env.PUSHER_KEY}', {encrypted: true})
+  .subscribe('${key}_meta')
+  .bind('reload', function(){window.location.reload()})
+  </script>`
+}
+
+
+const pusher = new Pusher({
+  appId:   process.env.PUSHER_APP_ID,
+  key:     process.env.PUSHER_KEY,
+  secret:  process.env.PUSHER_SECRET,
+  cluster: process.env.PUSHER_CLUSTER,
+  encrypted: true
+})
+
+function triggerLR(key){
+
+  pusher.trigger(key + '_meta', 'reload', 'yup')
+
+}
