@@ -204,6 +204,9 @@ app.get('/:key.tar.gz', (req, res, next) => {
 
         DEMO_KEY: key,
 
+        URL: url,
+        SECRET: config.secret,
+
         // TODO - these should be per-user
         PUSHER_APP_ID: process.env.PUSHER_APP_ID,
         PUSHER_KEY: process.env.PUSHER_KEY,
@@ -217,5 +220,59 @@ app.get('/:key.tar.gz', (req, res, next) => {
     }
 
   })
+
+})
+
+
+app.post('/:key/:secret/public/:file', (req, res, next) => {
+
+  const key = req.params.key
+  const secret = req.params.secret
+  const file = req.params.file
+
+  try {
+    slugValidator(key)
+  } catch (e) {
+    return next()
+  }
+
+  redis.get(`demo:${key}`)
+  .then( config_json => {
+
+    if(!config_json)
+      return next()
+
+    const config = JSON.parse(config_json)
+
+    if(secret == config.secret) {
+
+      console.log(`Accepting: ${file}`)
+
+      console.log(req.body)
+
+      var content = ''
+
+      const redisPath = `demo:${key}:content:${file}`
+
+      req
+        .on('data', chunk => content += chunk)
+        .on('end', c =>
+          redis.set(redisPath, content)
+          .then(d => {
+            console.log("saved")
+            res.send("OK")
+          })
+          .catch(next)
+        ).on('error', next)
+
+
+
+    } else {
+      console.error(`NOT AUTHORISED FOR ${key} ${config.secret}`)
+      res.sendStatus(401)
+    }
+
+  })
+  .catch(next)
 
 })

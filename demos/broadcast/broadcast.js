@@ -1,3 +1,5 @@
+require('./lib/sync')
+
 const Pusher = require('pusher')
 
 const pusher = new Pusher({
